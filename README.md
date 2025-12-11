@@ -2,6 +2,8 @@
 
 An experimental Rust driver for the **Rise Mode Aura Ice Black** water cooler with temperature display.
 
+![Rise Mode Aura Ice Black](images/devicepicture.png)
+
 ## Overview
 
 This driver reads CPU temperature from your system and sends it to the Rise Mode Aura Ice Black water cooler's integrated display. The driver communicates with the display via USB HID protocol.
@@ -22,9 +24,6 @@ Fully supported. Reads CPU temperature from:
 
 ### ❌ Windows
 **Currently NOT supported**. Temperature reading requires Linux-specific sysfs paths. The HID communication would work, but temperature reading needs to be implemented using Windows APIs or the `sysinfo` crate.
-
-### ❓ macOS
-Untested. Would require macOS-specific temperature reading implementation.
 
 ## Requirements
 
