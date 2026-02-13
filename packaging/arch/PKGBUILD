@@ -7,7 +7,7 @@ arch=('x86_64' 'aarch64')
 url="https://github.com/evozniak/risemode-driver"
 license=('MIT')
 depends=('hidapi')
-makedepends=('cargo' 'git' 'hidapi')
+makedepends=('cargo' 'git' 'hidapi' 'pkgconf')
 source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
 sha256sums=('SKIP')
 
