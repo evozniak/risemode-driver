@@ -37,7 +37,7 @@ package() {
     install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
     
     # Install systemd service
-    install -Dm644 risemode-driver.service "$pkgdir/usr/lib/systemd/system/risemode-driver.service"
+    install -Dm644 packaging/arch/risemode-driver.service "$pkgdir/usr/lib/systemd/system/risemode-driver.service"
     
     # Install udev rules for device permissions
     install -Dm644 - "$pkgdir/usr/lib/udev/rules.d/99-risemode.rules" <<EOF
