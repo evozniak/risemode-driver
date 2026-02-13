@@ -32,9 +32,6 @@ jobs:
 
       - name: Generate .SRCINFO
         run: |
-          # Install tools for generating .SRCINFO
-          sudo pacman -Sy --noconfirm binutils fakeroot
-          
           cd packaging/arch
           
           # Update version in PKGBUILD
@@ -44,8 +41,9 @@ jobs:
           wget -q "https://github.com/${{ github.repository }}/archive/v${{ steps.version.outputs.version }}.tar.gz" -O source.tar.gz
           SHA256SUM=$(sha256sum source.tar.gz | awk '{print $1}')
           sed -i "s/^sha256sums=.*/sha256sums=('$SHA256SUM')/" PKGBUILD
+          rm source.tar.gz
           
-          # Generate .SRCINFO
+          # Generate .SRCINFO using Docker
           docker run --rm -v "$PWD:/pkg" archlinux:latest bash -c "
             pacman -Sy --noconfirm binutils fakeroot sudo base-devel
             useradd -m builder
