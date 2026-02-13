@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-hidapi = "2.6"
+hidapi = { version = "2.6", default-features = false, features = ["linux-shared-hidraw"] }
 anyhow = "1.0"
 sysinfo = "0.31"
