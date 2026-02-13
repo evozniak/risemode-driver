@@ -1,0 +1,66 @@
+name: Publish to AUR
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish (e.g., 0.1.0)'
+        required: true
+
+jobs:
+  publish-aur:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "release" ]; then
+            VERSION="${{ github.event.release.tag_name }}"
+            VERSION="${VERSION#v}"
+          else
+            VERSION="${{ github.event.inputs.version }}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing version: $VERSION"
+
+      - name: Generate .SRCINFO
+        run: |
+          # Install tools for generating .SRCINFO
+          sudo pacman -Sy --noconfirm binutils fakeroot
+          
+          cd packaging/arch
+          
+          # Update version in PKGBUILD
+          sed -i "s/^pkgver=.*/pkgver=${{ steps.version.outputs.version }}/" PKGBUILD
+          
+          # Download source tarball and calculate checksum
+          wget -q "https://github.com/${{ github.repository }}/archive/v${{ steps.version.outputs.version }}.tar.gz" -O source.tar.gz
+          SHA256SUM=$(sha256sum source.tar.gz | awk '{print $1}')
+          sed -i "s/^sha256sums=.*/sha256sums=('$SHA256SUM')/" PKGBUILD
+          
+          # Generate .SRCINFO
+          docker run --rm -v "$PWD:/pkg" archlinux:latest bash -c "
+            pacman -Sy --noconfirm binutils fakeroot sudo base-devel
+            useradd -m builder
+            chown -R builder:builder /pkg
+            cd /pkg
+            sudo -u builder makepkg --printsrcinfo > .SRCINFO
+          "
+
+      - name: Publish to AUR
+        uses: KSXGitHub/github-actions-deploy-aur@v2.7.2
+        with:
+          pkgname: risemode-driver
+          pkgbuild: ./packaging/arch/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "Update to version ${{ steps.version.outputs.version }}"
+          ssh_keyscan_types: rsa,ecdsa,ed25519
