@@ -40,9 +40,5 @@ package() {
     install -Dm644 packaging/arch/risemode-driver.service "$pkgdir/usr/lib/systemd/system/risemode-driver.service"
     
     # Install udev rules for device permissions
-    install -Dm644 - "$pkgdir/usr/lib/udev/rules.d/99-risemode.rules" <<EOF
-# Rise Mode Aura Ice Black water cooler
-SUBSYSTEM=="usb", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="7698", MODE="0666", GROUP="users"
-SUBSYSTEM=="hidraw", ATTRS{idVendor}=="0c45", ATTRS{idProduct}=="7698", MODE="0666", GROUP="users"
-EOF
+    install -Dm644 packaging/arch/99-risemode.rules "$pkgdir/usr/lib/udev/rules.d/99-risemode.rules"
 }
